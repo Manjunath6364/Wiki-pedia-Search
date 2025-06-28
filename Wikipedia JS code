@@ -1,0 +1,87 @@
+let input=document.getElementById("searchInput");
+let searchResultsContainer=document.getElementById("searchResults");
+
+// Accessing the spinner Element
+let spinner=document.getElementById("spinner");
+
+
+// Creating a function to access the information from the web 
+function createAndAppendSearchResults(result){
+    // Creating Result Item
+    let resultElementcontainer=document.createElement("div");
+    resultElementcontainer.classList.add("result-item");
+    searchResultsContainer.appendChild(resultElementcontainer);
+
+    // Creating Title
+    // link,title and description will be obtainer in search_results array of the console
+    let {link,title,description}=result;
+    let resultTitle=document.createElement("a");
+        // if we click on that title it should open in a new web page
+    resultTitle.href=link;
+    resultTitle.target="_blank";
+        // Ex Karnataka, India, TajMahal
+    resultTitle.textContent=title;
+    resultTitle.classList.add("result-title");
+    resultElementcontainer.appendChild(resultTitle);
+
+    // Break Element
+    let resultTitleBreakEl=document.createElement("br");
+    resultElementcontainer.appendChild(resultTitleBreakEl);
+
+    // Creating a Url Element (Getting the URL[link] for the above title)
+    let urlEl=document.createElement("a");
+    urlEl.href=link;
+    urlEl.target="_blank";
+    urlEl.textContent=link;
+    urlEl.classList.add("result-url");
+    resultElementcontainer.appendChild(urlEl);
+
+    // Break Element
+    let urlBreakEl=document.createElement("br");
+    resultElementcontainer.appendChild(urlBreakEl);
+
+    // Creating a Description for the search Text (Information)
+    let descriptionEl=document.createElement("p");
+    descriptionEl.classList.add("link-description");
+    descriptionEl.textContent=description;
+    resultElementcontainer.appendChild(descriptionEl);
+
+}
+
+function displayResults(searchResults){
+    // Hide the laoding icon when we start getting the results
+    spinner.classList.toggle("d-none")
+
+    // Calling a for loop to iterate all the array objects and to give all the search results
+    for(let result of searchResults){
+         createAndAppendSearchResults(result);
+    }
+   
+}
+
+
+// Addind a Event Listener for the KeyDown 
+input.addEventListener("keydown",function(event){
+    if(event.key==="Enter"){
+        spinner.classList.toggle("d-none")
+        // Clearing the search log before searching for another information
+         searchResultsContainer.textContent=""; 
+        let inputValue=input.value;
+        input.value="";
+
+        // fetch() method to assess the content over the web
+        let url="https://apis.ccbp.in/wiki-search?search="+inputValue;
+        let options={
+            method:"GET"
+        }
+        fetch(url,options)
+        .then(function(response){
+            return response.json()
+        }).
+        then(function(jsonData){
+            // search_results is the array which we get after fetch in the console
+            let {search_results}=jsonData;
+            displayResults(search_results)
+        });
+    }
+})
